@@ -7,7 +7,7 @@ use std::{
 use crate::{log, options::Opts, to_cstr, Module};
 
 use parking_lot::Mutex;
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 #[doc(hidden)]
 pub static MODULE: ModuleHolder = ModuleHolder::empty();
@@ -152,7 +152,7 @@ pub use paste;
 
 pub mod ffi {
     pub use super::zsys::Module;
-    pub use zsh_sys as zsys;
+    pub use zsh_ffi as zsys;
 }
 
 #[macro_export]

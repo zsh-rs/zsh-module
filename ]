@@ -2,7 +2,7 @@ use std::{mem, ops::{Deref, DerefMut}, ptr::NonNull};
 
 ///! This module implements a bridge to Zsh's memory allocation facilities.
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 #[repr(transparent)]
 pub struct ZBox<T>(std::ptr::NonNull<T>);

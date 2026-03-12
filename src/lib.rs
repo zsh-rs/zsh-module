@@ -93,7 +93,7 @@ pub use crate::types::{cstring::ToCString, error::*};
 use features::Features;
 pub use options::Opts;
 use types::cstring::to_cstr;
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 mod features;
 // mod hashtable;

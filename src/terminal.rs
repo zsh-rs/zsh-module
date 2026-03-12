@@ -1,8 +1,8 @@
 //! Stuff that is related to the actual terminal
 
 // /// TODO: Find out if these actually update
-// pub static LINES: u16 = zsh_sys::LINES;
-// pub static COLUMNS: u16 = zsh_sys::COLUMNS;
+// pub static LINES: u16 = zsh_ffi::LINES;
+// pub static COLUMNS: u16 = zsh_ffi::COLUMNS;
 
 // /// The window size, as reported by zsh
 // pub struct WindowSize {
@@ -21,4 +21,4 @@
 //     }
 // }
 
-pub type Color = zsh_sys::color_rgb;
+pub type Color = zsh_ffi::color_rgb;

@@ -1,6 +1,6 @@
 use std::ptr::slice_from_raw_parts_mut;
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 pub(crate) struct Features {
     pub raw: zsys::features,
