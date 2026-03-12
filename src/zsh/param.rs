@@ -1,6 +1,6 @@
 use std::ffi::{c_char, CStr};
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 use crate::{types::cstring::ManagedCStr, CStrArray, ToCString};
 

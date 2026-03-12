@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 use crate::types::cstring::str_from_cstr;
 

@@ -3,7 +3,7 @@ use std::path::Path;
 
 use crate::{ErrorCode, MaybeZError, ToCString, ZError};
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 mod param;
 

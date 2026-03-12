@@ -1,6 +1,6 @@
 use std::{ffi::c_void, marker::PhantomData, os::raw::c_char};
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 use crate::ToCString;
 
