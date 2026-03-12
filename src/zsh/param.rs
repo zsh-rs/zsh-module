@@ -2,7 +2,7 @@ use std::ffi::{c_char, CStr};
 
 use zsh_sys as zsys;
 
-use crate::{types::cstring::ManagedCStr, CStrArray, ToCString};
+use crate::{types::cstring::ManagedCStr, types::CStrArray, ToCString};
 
 // Taken from Src/zsh.h
 // TODO: generate this automatically from zsh
@@ -151,10 +151,10 @@ impl Param {
         ParamFlags::from_bits(self.0.node.flags).unwrap()
     }
 
-    fn_get_gsu!(scalar_gsu, s, GsuScalar);
-    fn_get_gsu!(int_gsu, i, GsuInteger);
-    fn_get_gsu!(float_gsu, f, GsuFloat);
-    fn_get_gsu!(array_gsu, a, GsuArray);
+    fn_get_gsu!(scalar_gsu, s, GsuScalar<'a>);
+    fn_get_gsu!(int_gsu, i, GsuInteger<'a>);
+    fn_get_gsu!(float_gsu, f, GsuFloat<'a>);
+    fn_get_gsu!(array_gsu, a, GsuArray<'a>);
 
     #[inline]
     pub fn type_of(&self) -> ParamType {
@@ -162,7 +162,7 @@ impl Param {
     }
 
     #[inline]
-    pub fn get_value(&mut self) -> ParamValue {
+    pub fn get_value(&mut self) -> ParamValue<'_> {
         match self.type_of() {
             ParamType::Scalar => {
                 ParamValue::Scalar(unsafe { CStr::from_ptr(self.scalar_gsu().get()) })
