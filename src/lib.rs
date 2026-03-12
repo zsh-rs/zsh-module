@@ -101,4 +101,4 @@ pub use crate::features::context::FeatureContext;
 pub use crate::features::builtin::BuiltinBuilder;
 pub use crate::types::result::Result;
 
-pub use zsh_sys;
+pub use zsh_ffi;

@@ -173,7 +173,7 @@ impl std::ops::Deref for CStringArray {
 
 impl Drop for CStringArray {
     fn drop(&mut self) {
-        unsafe { zsh_sys::freearray(self.0) }
+        unsafe { zsh_ffi::freearray(self.0) }
     }
 }
 

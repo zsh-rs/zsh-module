@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! zmodule {
     ($module_name:ident) => {
-        use $crate::zsh_sys as zsys;
+        use $crate::zsh_ffi as zsys;
 
         use $crate::module::container::ModuleContainer;
         use $crate::module::data::ModuleData;

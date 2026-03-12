@@ -2,7 +2,7 @@ use std::{mem, ops::{Deref, DerefMut}, ptr::NonNull};
 
 ///! This module implements a bridge to Zsh's memory allocation facilities.
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 /// A value allocated using Zsh's internal allocator API. This is useful when you want to store a
 /// value as a param, for example.

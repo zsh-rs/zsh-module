@@ -1,6 +1,6 @@
 use std::ffi::{c_char, c_int};
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 use super::entrypoints::LoadableModuleState;
 use crate::features::{store::FeatureStore, traits::FeatureDispatch};

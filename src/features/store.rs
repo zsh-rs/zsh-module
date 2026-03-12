@@ -1,4 +1,4 @@
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 use crate::module::LoadableModuleState;
 

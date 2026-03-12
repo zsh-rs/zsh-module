@@ -1,6 +1,6 @@
 use std::ffi::{CStr, c_char};
 use std::rc::Rc;
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 use crate::ToCString;
 use crate::module::LoadableModuleState;

@@ -1,6 +1,6 @@
 //! Zsh native log functions. This module contains high level interfaces to the zsh log functions.
 
-use zsh_sys as zsys;
+use zsh_ffi as zsys;
 
 use crate::ToCString;
 

@@ -39,7 +39,7 @@ pub trait OptHelpers {
 
 // Taken from `zsh.h`
 // Let's hope Zsh does not change the implementation of these:
-pub type Options = zsh_sys::options;
+pub type Options = zsh_ffi::options;
 impl OptHelpers for Options {
     #[inline(always)]
     fn is_minus(&self, c: c_char) -> bool {
