@@ -3,7 +3,7 @@ use std::path::Path;
 
 use crate::{ErrorCode, MaybeZError, ToCString, ZError};
 
-use zsh_ffi as zsys;
+use zsh;
 
 mod param;
 
@@ -39,13 +39,13 @@ pub fn eval_simple(cmd: impl ToCString) -> MaybeZError {
     static ZSH_CONTEXT_STRING: &[u8] = b"zsh-module-rs-eval\0";
     unsafe {
         let cmd = cmd.into_cstr();
-        zsys::execstring(
+        zsh::execstring(
             cmd.as_ptr() as *mut _,
             1,
             0,
             ZSH_CONTEXT_STRING.as_ptr() as *mut _,
         );
-        let errflag = zsys::errflag;
+        let errflag = zsh::errflag;
         if errflag != 0 {
             Err(ZError::EvalError(errflag as ErrorCode))
         } else {
@@ -58,7 +58,7 @@ pub fn eval_simple(cmd: impl ToCString) -> MaybeZError {
 
 // !TODO: implement zsh's stdin
 /* pub fn stdin() -> impl Read {
-    std::os::unix::io::FromRawFd::from_raw_fd(zsys::SHIN)
+    std::os::unix::io::FromRawFd::from_raw_fd(zsh::SHIN)
 } */
 
 pub fn source_file<P>(path: P) -> MaybeZError
@@ -73,8 +73,8 @@ where
     }
 
     let path_str = path.into_cstr();
-    let result = unsafe { zsys::source(path_str.as_ptr() as *mut _) };
-    if result == zsys::source_return_SOURCE_OK {
+    let result = unsafe { zsh::source(path_str.as_ptr() as *mut _) };
+    if result == zsh::source_return_SOURCE_OK {
         Ok(())
     } else {
         Err(ZError::SourceError(result as ErrorCode))

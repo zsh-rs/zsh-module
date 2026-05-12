@@ -1,6 +1,8 @@
 // use crate::variable;
 use std::{fmt, path::*};
 
+use crate::private::module::name::module_name;
+
 /// The internal error code type.
 pub type ErrorCode = isize;
 
@@ -13,7 +15,7 @@ pub enum ZError {
     Panicked(String),
 
     HandlerNotFound(String),
-    
+
     /// A low-level generic return type for zsh internal functions that return integer return types
     ///
     /// TODO: Rewrite zsh-sys stuff to use this (if a better solution cannot be implemented)
@@ -68,7 +70,6 @@ impl ZError {
     }
 }
 
-
 // impl<E: std::error::Error + std::fmt::Display> From<E> for ZError {
 //     fn from(e: E) -> Self {
 //         Self::CustomMessage(e.to_string())
@@ -85,4 +86,29 @@ impl ZError {
 pub type MaybeZError = Result<(), ZError>;
 
 /// A [`Result`] wrapper around [`ZError`].
-pub type ZResult<T> = Result<T, ZError>;
+// pub type ZResult<T> = Result<T, ZError>;
+pub(crate) enum ZResult<T> {
+    Ok(T),
+    Err(ZError),
+}
+
+impl<T> From<core::result::Result<T, ZError>> for ZResult<T> {
+    fn from(res: core::result::Result<T, ZError>) -> Self {
+        match res {
+            Ok(val) => ZResult::Ok(val),
+            Err(e) => ZResult::Err(e),
+        }
+    }
+}
+
+impl ZResult<()> {
+    pub fn safe_unwrap(self) -> i32 {
+        match self {
+            ZResult::Ok(_) => 0,
+            ZResult::Err(e) => {
+                crate::log::error_named(module_name(), e.to_string());
+                e.exit_code() as i32
+            }
+        }
+    }
+}

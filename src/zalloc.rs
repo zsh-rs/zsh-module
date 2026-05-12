@@ -2,7 +2,7 @@ use std::{mem, ops::{Deref, DerefMut}, ptr::NonNull};
 
 ///! This module implements a bridge to Zsh's memory allocation facilities.
 
-use zsh_ffi as zsys;
+use zsh;
 
 /// A value allocated using Zsh's internal allocator API. This is useful when you want to store a
 /// value as a param, for example.
@@ -12,7 +12,7 @@ pub struct ZBox<T>(std::ptr::NonNull<T>);
 impl<T> ZBox<T> {
     /// Allocates a value using Zsh's internal allocator API.
     pub fn new(val: T) -> Self {
-        let ptr = unsafe { zsys::zalloc(mem::size_of::<T>()) };
+        let ptr = unsafe { zsh::zalloc(mem::size_of::<T>()) };
         let ptr = NonNull::new(ptr.cast::<T>()).unwrap();
         unsafe { ptr.as_ptr().write(val) };
         Self(ptr)
@@ -22,7 +22,7 @@ impl<T> ZBox<T> {
 impl<T> Drop for ZBox<T> {
     fn drop(&mut self) {
         unsafe {
-            zsys::zfree(self.0.as_ptr().cast(), mem::size_of::<T>() as i32)
+            zsh::zfree(self.0.as_ptr().cast(), mem::size_of::<T>() as i32)
         }
     }
 }

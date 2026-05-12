@@ -1,6 +1,6 @@
 use std::ffi::{c_char, CStr};
 
-use zsh_ffi as zsys;
+use zsh;
 
 use crate::{types::cstring::ManagedCStr, types::CStrArray, ToCString};
 
@@ -99,7 +99,7 @@ impl std::fmt::Debug for Param {
 macro_rules! gsu_wrapper {
     ($(struct $ident:ident ($raw:ty) -> $T:ty);* $(;)?) => {
         $(
-        struct $ident<'a>(&'a $raw, zsys::Param);
+        struct $ident<'a>(&'a $raw, zsh::Param);
         impl<'a> $ident<'a> {
             #[inline]
             unsafe fn new(raw: *const $raw, param: &'a mut Param) -> Self {
@@ -123,10 +123,10 @@ macro_rules! gsu_wrapper {
 }
 
 gsu_wrapper! {
-    struct GsuScalar(zsys::gsu_scalar) -> *mut c_char;
-    struct GsuInteger(zsys::gsu_integer) -> zsys::zlong;
-    struct GsuFloat(zsys::gsu_float) -> f64;
-    struct GsuArray(zsys::gsu_array) -> *mut *mut c_char;
+    struct GsuScalar(zsh::gsu_scalar) -> *mut c_char;
+    struct GsuInteger(zsh::gsu_integer) -> zsh::zlong;
+    struct GsuFloat(zsh::gsu_float) -> f64;
+    struct GsuArray(zsh::gsu_array) -> *mut *mut c_char;
 }
 
 macro_rules! fn_get_gsu {
@@ -140,10 +140,10 @@ macro_rules! fn_get_gsu {
 
 /// A Zsh `Param`. This corresponds to a value inside Zsh.
 #[repr(transparent)]
-pub struct Param(zsys::param);
+pub struct Param(zsh::param);
 
 impl Param {
-    fn as_mut_ptr(&mut self) -> zsys::Param {
+    fn as_mut_ptr(&mut self) -> zsh::Param {
         &mut self.0
     }
     #[inline]
@@ -194,8 +194,8 @@ pub fn get(name: impl ToCString) -> Option<Param> {
     let name = name.into_cstr().into_owned();
     let og_name = name.clone();
     let mut name = ManagedCStr::new(name);
-    let mut value: zsys::value = unsafe { std::mem::zeroed() };
-    if unsafe { zsys::getvalue(&mut value, &mut name.ptr(), 1) }.is_null() {
+    let mut value: zsh::value = unsafe { std::mem::zeroed() };
+    if unsafe { zsh::getvalue(&mut value, &mut name.ptr(), 1) }.is_null() {
         None
     } else {
         unsafe {
