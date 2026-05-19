@@ -1,0 +1,32 @@
+allow-branch = [
+    "*",
+    "!HEAD",
+]
+
+sign-commit = true
+sign-tag = true
+
+push-remote = "origin"
+release = true
+publish = true
+verify = true
+owners = []
+push = true
+push-options = []
+consolidate-commits = false
+pre-release-commit-message = "chore: release {{crate_name}} version {{version}}"
+tag-message = "chore: release {{crate_name}} version {{version}}"
+tag-name = "{{prefix}}v{{version}}"
+tag = true
+enable-features = []
+enable-all-features = false
+dependent-version = "upgrade"
+metadata = "optional"
+certs-source = "webpki"
+
+[unstable]
+workspace-publish = false
+
+[rate-limit]
+new-packages = 5
+existing-packages = 30
