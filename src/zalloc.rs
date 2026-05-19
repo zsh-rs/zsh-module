@@ -1,47 +1,19 @@
-use std::{mem, ops::{Deref, DerefMut}, ptr::NonNull};
+use std::alloc;
 
-///! This module implements a bridge to Zsh's memory allocation facilities.
-
-use zsh;
-
-/// A value allocated using Zsh's internal allocator API. This is useful when you want to store a
-/// value as a param, for example.
-#[repr(transparent)]
-pub struct ZBox<T>(std::ptr::NonNull<T>);
-
-impl<T> ZBox<T> {
-    /// Allocates a value using Zsh's internal allocator API.
-    pub fn new(val: T) -> Self {
-        let ptr = unsafe { zsh::zalloc(mem::size_of::<T>()) };
-        let ptr = NonNull::new(ptr.cast::<T>()).unwrap();
-        unsafe { ptr.as_ptr().write(val) };
-        Self(ptr)
+struct ZshAllocator;
+unsafe impl alloc::GlobalAlloc for ZshAllocator {
+    unsafe fn alloc(&self, layout: alloc::Layout) -> *mut u8 {
+        unsafe { zsh::zalloc(layout.size()) as _ }
     }
+
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: alloc::Layout) {
+        unsafe { zsh::zfree(ptr as _, layout.size().try_into().unwrap()) }
+    }
+
+    // unsafe fn realloc(&self, ptr: *mut u8, _: alloc::Layout, new_size: usize) -> *mut u8 {
+    //     unsafe { zsh::zrealloc(ptr as _, new_size) as _ }
+    // }
 }
 
-impl<T> Drop for ZBox<T> {
-    fn drop(&mut self) {
-        unsafe {
-            zsh::zfree(self.0.as_ptr().cast(), mem::size_of::<T>() as i32)
-        }
-    }
-}
-
-impl<T> std::fmt::Debug for ZBox<T> where T: std::fmt::Debug {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("ZBox").field(&*self).finish()
-    }
-}
-
-impl<T> Deref for ZBox<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-       unsafe { self.0.as_ref() }
-    }
-}
-
-impl<T> DerefMut for ZBox<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-       unsafe { self.0.as_mut() }
-    }
-}
+#[global_allocator]
+static Z_ALLOCATOR: ZshAllocator = ZshAllocator;
