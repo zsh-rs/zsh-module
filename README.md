@@ -1,4 +1,4 @@
-# `zsh-module`
+# `zsh-module` [![Crates.io](https://img.shields.io/crates/v/zsh-module.svg)](https://crates.io/crates/zsh-module) [![Documentation](https://docs.rs/zsh-module/badge.svg)](https://docs.rs/zsh-module) [![License](https://img.shields.io/crates/l/zsh-module.svg)](https://crates.io/crates/zsh-module)
 
 This crate allows users to define ZSH modules in Rust. It provides a simple API for creating ZSH modules and handling ZSH commands.
 
