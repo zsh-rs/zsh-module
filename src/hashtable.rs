@@ -1,6 +1,6 @@
 use std::{ffi::c_void, marker::PhantomData, os::raw::c_char};
 
-use zsh_ffi as zsys;
+use zsh;
 
 use crate::ToCString;
 
@@ -8,11 +8,11 @@ use crate::ToCString;
 ///
 /// TODO: Finish this
 pub(crate) struct RawHashTable {
-    raw: zsys::HashTable,
+    raw: zsh::HashTable,
 }
 
 impl RawHashTable {
-    pub(crate) unsafe fn from_raw(raw: zsys::HashTable) -> Self {
+    pub(crate) unsafe fn from_raw(raw: zsh::HashTable) -> Self {
         Self { raw }
     }
     pub(crate) unsafe fn insert(&self, name: *mut c_char, node: *mut c_void) {
@@ -31,25 +31,25 @@ impl RawHashTable {
     }
     pub(crate) unsafe fn dump(&self) {
         let printnode = ((*self.raw).printnode).expect("Hashtable does not support operation");
-        zsys::scanhashtable(
+        zsh::scanhashtable(
             self.raw,
             1,
             0,
             0,
             Some(printnode),
-            (zsys::PRINT_TYPE | zsys::PRINT_TYPESET) as i32,
+            (zsh::PRINT_TYPE | zsh::PRINT_TYPESET) as i32,
         );
     }
 }
 
 /* #[repr(C)]
 struct HashNode<V> {
-    node: zsys::hashnode,
+    node: zsh::hashnode,
     raw: V
 }
 
 impl<V> HashNode<V> {
-    pub(crate) unsafe fn from_raw(raw: zsys::HashNode) -> *mut Self {
+    pub(crate) unsafe fn from_raw(raw: zsh::HashNode) -> *mut Self {
         std::mem::transmute(raw)
     }
 } */
@@ -69,7 +69,7 @@ impl<V> std::ops::Drop for HashTable<V> {
 }
 
 impl<V> HashTable<V> {
-    pub(crate) unsafe fn new(raw: zsys::HashTable, drop: impl FnOnce() + 'static) -> Self {
+    pub(crate) unsafe fn new(raw: zsh::HashTable, drop: impl FnOnce() + 'static) -> Self {
         Self {
             raw: RawHashTable::from_raw(raw),
             phantom: PhantomData,

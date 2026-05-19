@@ -1,5 +1,6 @@
-pub mod cstring;
-pub mod error;
-pub mod string_array;
+pub(crate) mod cstring;
+pub(crate) mod string_array;
 
-pub use string_array::{CStrArray, CStringArray};
+pub mod result;
+
+pub(crate) use string_array::{CStrArray, CStringArray};

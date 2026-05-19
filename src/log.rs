@@ -1,6 +1,6 @@
 //! Zsh native log functions. This module contains high level interfaces to the zsh log functions.
 
-use zsh_ffi as zsys;
+use zsh;
 
 use crate::ToCString;
 
@@ -8,19 +8,19 @@ use crate::ToCString;
 pub fn warn_named(cmd: impl ToCString, msg: impl ToCString) {
     let cmd_c = cmd.into_cstr();
     let msg_c = msg.into_cstr();
-    unsafe { zsys::zwarnnam(cmd_c.as_ptr(), msg_c.as_ptr()) }
+    unsafe { zsh::zwarnnam(cmd_c.as_ptr(), msg_c.as_ptr()) }
 }
 
 /// Prints out a warning message. See [`crate::warn!`]
 pub fn warn(msg: impl ToCString) {
     let msg_c = msg.into_cstr();
-    unsafe { zsys::zwarn(msg_c.as_ptr()) }
+    unsafe { zsh::zwarn(msg_c.as_ptr()) }
 }
 
 /// Prints out an error message. See [`crate::error!`]
 pub fn error(msg: impl ToCString) {
     let msg_c = msg.into_cstr();
-    unsafe { zsys::zerr(msg_c.as_ptr()) }
+    unsafe { zsh::zerr(msg_c.as_ptr()) }
 }
 
 /// Prints out an error message from the command `cmd`. See [`crate::error_named!`]
@@ -29,7 +29,7 @@ pub fn error(msg: impl ToCString) {
 pub fn error_named(cmd: impl ToCString, msg: impl ToCString) {
     let cmd = cmd.into_cstr();
     let msg = msg.into_cstr();
-    unsafe { zsys::zerrnam(cmd.as_ptr(), msg.as_ptr()) }
+    unsafe { zsh::zerrnam(cmd.as_ptr(), msg.as_ptr()) }
 }
 
 #[macro_export]

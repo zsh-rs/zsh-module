@@ -13,9 +13,10 @@
 //! ```
 //!
 use std::{
-    ffi::{c_char, CStr},
+    ffi::{CStr, c_char},
+    iter,
     marker::PhantomData,
-    ops::Deref,
+    ops::{Deref, Not},
 };
 
 /// A thin wrapper around a C string array. A.K.A null terminated pointer of strings
@@ -35,7 +36,7 @@ pub struct CStrArray(*const *const c_char);
 impl CStrArray {
     #[inline]
     /// Creates a [`CStrArray`] from a raw pointer. This function assumes the pointer is valid.
-    pub(crate) unsafe fn from_raw(raw: *const *const c_char) -> Self {
+    pub(crate) fn from_raw(raw: *const *const c_char) -> Self {
         Self(raw)
     }
 
@@ -172,6 +173,26 @@ impl std::ops::Deref for CStringArray {
 
 impl Drop for CStringArray {
     fn drop(&mut self) {
-        unsafe { zsh_ffi::freearray(self.0) }
+        unsafe { zsh::freearray(self.0) }
+    }
+}
+
+pub(crate) trait PointerIter {
+    fn ptr_iter<'a>(self) -> impl Iterator<Item = *const c_char> + 'a;
+    fn ptr_iter_mut<'a>(self) -> impl Iterator<Item = *mut c_char> + 'a;
+}
+
+impl PointerIter for *mut *mut c_char {
+    fn ptr_iter<'a>(self) -> impl Iterator<Item = *const c_char> + 'a {
+        self.ptr_iter_mut().map(|ptr| ptr as *const c_char)
+    }
+
+    fn ptr_iter_mut<'a>(self) -> impl Iterator<Item = *mut c_char> + 'a {
+        let mut offset = 0;
+        iter::from_fn(move || {
+            let ptr = unsafe { self.add(offset).read() };
+            offset += 1;
+            ptr.is_null().not().then_some(ptr)
+        })
     }
 }

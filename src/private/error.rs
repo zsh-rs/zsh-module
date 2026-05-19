@@ -1,6 +1,8 @@
 // use crate::variable;
 use std::{fmt, path::*};
 
+use crate::private::module::name::module_name;
+
 /// The internal error code type.
 pub type ErrorCode = isize;
 
@@ -10,6 +12,10 @@ pub type ErrorCode = isize;
 /// Comes with several useful error types.
 #[derive(Debug)]
 pub enum ZError {
+    Panicked(String),
+
+    HandlerNotFound(String),
+
     /// A low-level generic return type for zsh internal functions that return integer return types
     ///
     /// TODO: Rewrite zsh-sys stuff to use this (if a better solution cannot be implemented)
@@ -33,7 +39,8 @@ impl fmt::Display for ZError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Other(i) => write!(f, "Received return code: {i}"),
-
+            Self::HandlerNotFound(h) => write!(f, "No handler found for '{}'", h),
+            Self::Panicked(s) => write!(f, "[panic] {s}"),
             Self::EvalError(e) => write!(f, "eval error: {e}"),
             Self::SourceError(e) => write!(f, "source error: {e}"),
             Self::FileNotFound(p) => write!(f, "File not found: {}", p.display()),
@@ -42,11 +49,32 @@ impl fmt::Display for ZError {
         }
     }
 }
-impl From<ErrorCode> for ZError {
-    fn from(e: ErrorCode) -> Self {
-        Self::Other(e)
+// impl From<ErrorCode> for ZError {
+//     fn from(e: ErrorCode) -> Self {
+//         Self::Other(e)
+//     }
+// }
+
+impl ZError {
+    pub(crate) fn exit_code(&self) -> u8 {
+        match self {
+            Self::Other(_) => 80,
+            Self::Panicked(_) => 81,
+            Self::EvalError(_) => 82,
+            Self::SourceError(_) => 83,
+            Self::FileNotFound(_) => 84,
+            Self::Conversion(_) => 85,
+            Self::HandlerNotFound(_) => 86,
+            Self::CustomMessage(_) => 1,
+        }
     }
 }
+
+// impl<E: std::error::Error + std::fmt::Display> From<E> for ZError {
+//     fn from(e: E) -> Self {
+//         Self::CustomMessage(e.to_string())
+//     }
+// }
 // impl From<variable::VarError> for ZError {
 //     fn from(e: variable::VarError) -> Self {
 //         Self::Var(e)
@@ -58,4 +86,29 @@ impl From<ErrorCode> for ZError {
 pub type MaybeZError = Result<(), ZError>;
 
 /// A [`Result`] wrapper around [`ZError`].
-pub type ZResult<T> = Result<T, ZError>;
+// pub type ZResult<T> = Result<T, ZError>;
+pub(crate) enum ZResult<T> {
+    Ok(T),
+    Err(ZError),
+}
+
+impl<T> From<core::result::Result<T, ZError>> for ZResult<T> {
+    fn from(res: core::result::Result<T, ZError>) -> Self {
+        match res {
+            Ok(val) => ZResult::Ok(val),
+            Err(e) => ZResult::Err(e),
+        }
+    }
+}
+
+impl ZResult<()> {
+    pub fn safe_unwrap(self) -> i32 {
+        match self {
+            ZResult::Ok(_) => 0,
+            ZResult::Err(e) => {
+                crate::log::error_named(module_name(), e.to_string());
+                e.exit_code() as i32
+            }
+        }
+    }
+}

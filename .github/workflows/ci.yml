@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - README.md
+      - release.toml
+      - CHANGELOG.md
+      - docs/**
+    branches: [ "main" ]
+  pull_request:
+    paths-ignore:
+      - README.md
+      - release.toml
+      - CHANGELOG.md
+      - docs/**
+    branches: [ "main" ]
+
+jobs:
+  ci:
+    name: ${{ matrix.os.display }} / ${{ matrix.cargo_flags.display }}
+    runs-on: ${{ matrix.os.value }}
+    strategy:
+      matrix:
+        os:
+          - { value: ubuntu-latest, display: linux }
+          - { value: macOS-latest, display: macos }
+        cargo_flags:
+          - { value: "--no-default-features", display: no-default-features }
+          - { value: "--all-features", display: all-features }
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Install ZSH
+        if: runner.os == 'Linux'
+        run: sudo apt-get install zsh
+         
+      - name: ⚡ Cache cargo registry
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-directories: |
+            ~/.cache/zsh-src
+            ~/Library/Caches/dev.zsh-rs.zsh-src
+
+      - name: 🔨 Build
+        run: cargo build --all ${{ matrix.cargo_flags.value }}
+        
+      - name: 🧪 Test
+        run: cargo test --all ${{ matrix.cargo_flags.value }}
+
+      - name: 📋 Upload config.log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: config-log-${{ matrix.os.value }}
+          path: |
+            ~/Library/Caches/dev.zsh-rs.zsh-src/zsh-5.9/config.log
+            ~/.cache/zsh-src/zsh-5.9/config.log
+
+        
