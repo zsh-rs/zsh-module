@@ -8,7 +8,7 @@ pub use flags::Flags;
 mod lifecycle;
 pub use lifecycle::{Activate, Deactivate};
 // pub mod log;            // TODO: Implement a better logging system that supports conditional compilation and better log levels/formatting
-pub mod param;          // TODO: Implement parameter manipulation functions
+// pub mod param;          // TODO: Implement parameter manipulation functions
 pub mod types;          // TODO: Revisit the necessity of this module.
 pub use crate::types::result::Result;
 // pub mod variable;
@@ -16,7 +16,6 @@ pub use crate::types::result::Result;
 mod zalloc;
 
 // TODO: Revisit all of the string modules
-pub use crate::types::cstring::ToCString;
 
 // Re-exported public API
 #[doc(inline)]

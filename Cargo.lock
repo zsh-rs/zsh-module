@@ -763,7 +763,6 @@ dependencies = [
 [[package]]
 name = "zsh-module-macros"
 version = "0.1.0"
-source = "git+https://github.com/zsh-rs/zsh-module-macros.git#468031cf67255afa28cb7388ee5f98b6dfd315b9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -784,8 +783,7 @@ dependencies = [
 
 [[package]]
 name = "zsh-sys"
-version = "0.2.0"
-source = "git+https://github.com/zsh-rs/zsh-sys.git#df7ced807f6acd88a4217e300eec24e73494b5cb"
+version = "0.2.1"
 dependencies = [
  "bindgen",
  "glob",
