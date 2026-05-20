@@ -19,15 +19,13 @@ on:
 jobs:
   ci:
     name: ${{ matrix.os.display }} / ${{ matrix.cargo_flags.display }}
-    runs-on: ${{ matrix.os.value }}
+    runs-on: ${{ matrix.os.value }}-latest
     strategy:
       matrix:
         os:
-          - { value: ubuntu-latest, display: linux }
-          - { value: macOS-latest, display: macos }
-        cargo_flags:
-          - { value: "--no-default-features", display: no-default-features }
-          - { value: "--all-features", display: all-features }
+          - { value: ubuntu, display: linux }
+          - { value: macOS, display: macos }
+        cargo_flags: [no-default-features, all-features ]
     steps:
       - uses: actions/checkout@v6
 
@@ -46,18 +44,19 @@ jobs:
           cache-directories: |
             ~/.cache/zsh-src
             ~/Library/Caches/dev.zsh-rs.zsh-src
+            tests/fixtures/test-fixture/target
 
       - name: 🔨 Build
-        run: cargo build --all ${{ matrix.cargo_flags.value }}
+        run: cargo build --all --${{ matrix.cargo_flags }}
         
       - name: 🧪 Test
-        run: cargo test --all ${{ matrix.cargo_flags.value }}
+        run: cargo test --all --${{ matrix.cargo_flags }}
 
       - name: 📋 Upload fixture build log on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os.display }}-${{matrix.cargo_flags.display}}-fixture-build-log
+          name: ${{ matrix.os.display }}-${{matrix.cargo_flags}}-fixture-build-log
           path: tests/fixtures/test-fixture/target/debug/logs/build.log
 
         
