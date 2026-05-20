@@ -58,7 +58,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os.display }}-${{matrix.cargo_flags.display}}-fixture-build-log
-          path: |
-            ./tests/fixtures/test-fixture/target/debug/logs/build.log
+          path: tests/fixtures/test-fixture/target/debug/logs/build.log
 
         
