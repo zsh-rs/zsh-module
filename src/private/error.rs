@@ -109,6 +109,8 @@ impl ZResult<()> {
                 let err_cstr = CString::new(e.to_string()).unwrap_or_else(|_| {
                     CString::new("An error occurred, but the error message contained a null byte and could not be displayed.").unwrap()
                 });
+
+                // TODO: Figure out long term logging strategy
                 unsafe { zsh::zerrnam(module_name().as_ptr() as _, err_cstr.as_ptr()) };
                 e.exit_code() as i32
             }
