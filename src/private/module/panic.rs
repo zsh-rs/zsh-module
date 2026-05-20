@@ -22,6 +22,7 @@ where
                 CString::new("A panic occurred, but the panic message contained a null byte and could not be displayed.").unwrap()
             });
 
+            // TODO: Figure out long term logging strategy
             unsafe { zsh::zerrnam(module_name().as_ptr() as _, err_cstr.as_ptr()) };
 
             None
