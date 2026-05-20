@@ -7,7 +7,7 @@ const FIXTURE_LIB_NAME: &str = "test_fixture";
 
 static FIXTURE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let fixture_root = PathBuf::from(manifest_dir).join("tests/fixtures/test-fixture");
+    let fixture_root = PathBuf::from(manifest_dir).join("tests/e2e/fixtures/module");
 
     let mut cmd = Command::new(env!("CARGO"));
     cmd.arg("build")

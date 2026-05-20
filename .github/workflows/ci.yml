@@ -42,7 +42,7 @@ jobs:
           cache-directories: |
             ~/.cache/zsh-src
             ~/Library/Caches/dev.zsh-rs.zsh-src
-            tests/fixtures/test-fixture/target
+            tests/e2e/fixtures/module/target
 
       - name: 🔨 Build
         run: cargo build --all --${{ matrix.cargo_flags }}
@@ -55,6 +55,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ matrix.cargo_flags }}-fixture-build-log
-          path: tests/fixtures/test-fixture/target/debug/logs/build.log
+          path: tests/e2e/fixtures/module/target/debug/logs/build.log
 
         

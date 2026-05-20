@@ -8,4 +8,4 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
-zsh-module = { path = "../../.." }
+zsh-module = { path = "../../../.." }

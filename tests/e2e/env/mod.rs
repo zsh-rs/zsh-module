@@ -1,7 +1,4 @@
-use fixtures::ZshExec;
-
-#[path = "../fixtures/mod.rs"]
-pub mod fixtures;
+use crate::e2e::fixtures::{self, ZshExec};
 
 mod array;
 mod float;
