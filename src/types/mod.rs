@@ -1,6 +1,3 @@
-pub(crate) mod cstring;
-pub(crate) mod string_array;
+pub(crate) mod ptr_iter;
 
 pub mod result;
-
-pub(crate) use string_array::{CStrArray, CStringArray};

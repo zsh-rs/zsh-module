@@ -4,7 +4,7 @@ use crate::lifecycle::ModuleState;
 
 use crate::flags::Flags;
 use crate::types::result::Result;
-use crate::types::string_array::PointerIter;
+use crate::types::ptr_iter::PointerIter;
 
 
 type BuiltinFn<S> = fn(&S, &CStr, &[&CStr], &Flags) -> Result<()>;

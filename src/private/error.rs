@@ -1,5 +1,5 @@
 // use crate::variable;
-use std::{fmt, path::*};
+use std::{ffi::CString, fmt, path::*};
 
 use crate::private::module::name::module_name;
 
@@ -106,7 +106,10 @@ impl ZResult<()> {
         match self {
             ZResult::Ok(_) => 0,
             ZResult::Err(e) => {
-                crate::log::error_named(module_name(), e.to_string());
+                let err_cstr = CString::new(e.to_string()).unwrap_or_else(|_| {
+                    CString::new("An error occurred, but the error message contained a null byte and could not be displayed.").unwrap()
+                });
+                unsafe { zsh::zerrnam(module_name().as_ptr() as _, err_cstr.as_ptr()) };
                 e.exit_code() as i32
             }
         }

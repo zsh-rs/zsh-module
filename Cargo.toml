@@ -12,10 +12,11 @@ A High-level framework for creating dynamically-loadable zsh modules
 exclude = ["tests/fixtures"]
 
 [features]
-export_module = []
-default = ["export_module"]
 
 [dependencies]
 zsh-sys = { git = "https://github.com/zsh-rs/zsh-sys.git", version = "0.2" }
 zsh-module-macros = { git = "https://github.com/zsh-rs/zsh-module-macros.git", version = "0.1" }
 linkme = "0.3.36"
+
+[dev-dependencies]
+zsh-sys = { git = "https://github.com/zsh-rs/zsh-sys.git", version = "0.2", features = ["test-stubs"]}
