@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::ffi::{CStr, CString};
 
-use crate::types::string_array::PointerIter;
+use crate::types::ptr_iter::PointerIter;
 
 use super::ParamError;
 use super::helpers::{Unmetafy, lookup_value};
