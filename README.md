@@ -17,7 +17,8 @@ crate-type = ["cdylib"]
 ## Boilerplate
 On your `lib.rs`, you need to put a `export_module!` macro call, alongside a `setup` function
 (can be called whatever you want):
-```rust
+<!-- TODO: Use new proc macros -->
+```rust,ignore
 use zsh_module::{ Module, ModuleBuilder };
 
 zsh_module::export_module!(my_module, setup);
@@ -26,10 +27,12 @@ fn setup() -> Result<Module, Box<dyn std::error::Error>> {
    todo!()
 }
 ```
+
 ## The `setup` function
 A proper `setup` function must return a `Result<Module, E>` where `E` implements
 `std::error::Error`. E.g:
-```rust
+<!-- TODO: Detail the activate and deactivate traits -->
+```rust,ignore
 fn setup() -> Result<Module, Box<dyn std::error::Error>> { .. }
 
 fn setup() -> Result<Module, anyhow::Error> { .. }
@@ -40,7 +43,8 @@ fn setup() -> Result<Module, std::io::Error> { .. }
 ## Storing User Data
 You can store user data inside a module and have it accessible from any callbacks.
 Here's an example module, located at  that defines a new `greet` builtin command:
-```rust
+<!-- TODO: Update to copy example module -->
+```rust,ignore
 use zsh_module::{Builtin, MaybeZError, Module, ModuleBuilder, Opts, StringArray};
 
 // Notice how this module gets installed as `rgreeter`
@@ -70,19 +74,19 @@ dynamic loadable library extension.
 
 To add a folder to your `$module_path`, add the following code to your `.zshrc`:
 
-```sh no_run
+```sh,no_run
 typeset -aUg module_path
 module_path+=($HOME/.zsh/modules)
 ```
 
 For development, you can consider symlinking the library into that folder in your `$module_path`.
 
-```sh no_run
+```sh,no_run
 ln -s "$PWD/target/debug/libmodule.so" "$HOME/.zsh/modules/module.so"
 ```
 
 If everything went fine, you can load it in zsh using the following command:
-```sh no_run
+```sh,no_run
 zmodload <module-name>
 ```
 
