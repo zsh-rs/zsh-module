@@ -18,13 +18,11 @@ on:
 
 jobs:
   ci:
-    name: ${{ matrix.os.display }} / ${{ matrix.cargo_flags }}
-    runs-on: ${{ matrix.os.value }}-latest
+    name: ${{ matrix.os }} / ${{ matrix.cargo_flags }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os:
-          - { value: ubuntu, display: linux }
-          - { value: macOS, display: macos }
+        os: [ ubuntu, macOS ]
         cargo_flags: [no-default-features, all-features ]
     steps:
       - uses: actions/checkout@v6
@@ -56,7 +54,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os.display }}-${{matrix.cargo_flags}}-fixture-build-log
+          name: ${{ matrix.os }}-${{ matrix.cargo_flags }}-fixture-build-log
           path: tests/fixtures/test-fixture/target/debug/logs/build.log
 
         
