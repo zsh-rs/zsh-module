@@ -9,7 +9,7 @@ edition = "2024"
 description = """
 A High-level framework for creating dynamically-loadable zsh modules
 """
-exclude = ["tests/fixtures"]
+exclude = ["tests/e2e/fixtures"]
 
 [features]
 
