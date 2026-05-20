@@ -28,7 +28,7 @@ static FIXTURE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     if log_dir.exists() {
         std::fs::remove_dir_all(&log_dir).expect("failed to clean fixture logs directory");
     }
-    std::fs::create_dir(&log_dir).expect("failed to create fixture logs directory");
+    std::fs::create_dir_all(&log_dir).expect("failed to create fixture logs directory");
     let log_file = std::fs::File::create(log_dir.join("build.log"))
         .expect("failed to create fixture build log file");
     let err_file = log_file
