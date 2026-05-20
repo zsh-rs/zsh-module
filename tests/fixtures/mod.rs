@@ -12,9 +12,7 @@ static FIXTURE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut cmd = Command::new(env!("CARGO"));
     cmd.arg("build")
         .arg("--manifest-path")
-        .arg(fixture_root.join("Cargo.toml"))
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
+        .arg(fixture_root.join("Cargo.toml"));
 
     let profile = if cfg!(debug_assertions) {
         "debug"
@@ -23,12 +21,28 @@ static FIXTURE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
         "release"
     };
 
+    let out_dir = fixture_root.join("target").join(profile);
+
+    // log files
+    let log_dir = out_dir.join("logs");
+    if log_dir.exists() {
+        std::fs::remove_dir_all(&log_dir).expect("failed to clean fixture logs directory");
+    }
+    std::fs::create_dir(&log_dir).expect("failed to create fixture logs directory");
+    let log_file = std::fs::File::create(log_dir.join("build.log"))
+        .expect("failed to create fixture build log file");
+    let err_file = log_file
+        .try_clone()
+        .expect("failed to clone log file for cargo stderr");
+
+    // Run build
     let status = cmd
+        .stdout(Stdio::from(err_file))
+        .stderr(Stdio::from(log_file))
         .status()
         .expect("failed to invoke cargo to build test fixture");
-    assert!(status.success(), "test fixture cargo build failed");
 
-    let out_dir = fixture_root.join("target").join(profile);
+    assert!(status.success(), "test fixture cargo build failed");
 
     // zsh resolves `zmodload libtest_fixture` to `<dir>/libtest_fixture<DL_EXT>`,
     // where DL_EXT is `.so` on Linux and on typical macOS zsh builds. Rust's

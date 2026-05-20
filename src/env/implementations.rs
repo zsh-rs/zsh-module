@@ -29,7 +29,7 @@ impl GetEnv for f64 {
     fn get_env(name: Vec<u8>) -> Result<Self, ParamError> {
         lookup_value(&name, zsh::PM_FFLOAT).or(lookup_value(&name, zsh::PM_EFLOAT))?;
 
-        let value: zsh::mnumber = unsafe { zsh::getnparam(name.as_ptr() as _) };
+        let _value: zsh::mnumber = unsafe { zsh::getnparam(name.as_ptr() as _) };
         todo!("getnparam returns a union of int/float, need to check type and convert to f64")
     }
 }

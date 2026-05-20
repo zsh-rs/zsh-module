@@ -28,6 +28,6 @@ pub fn set<T: SetEnv>(name: impl Into<Vec<u8>>, value: T) -> Result<(), ParamErr
     value.set_env(name)
 }
 
-pub fn unset(name: &str) -> Result<(), ParamError> {
+pub fn unset(_name: &str) -> Result<(), ParamError> {
     todo!("Implement unset()")
 }
