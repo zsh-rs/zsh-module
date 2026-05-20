@@ -1,4 +1,15 @@
-use super::common::ZshExec;
+use super::fixtures::ZshExec;
+
+#[test]
+fn get() {
+    let out = r#"
+        MY_GET="hello from zsh"
+        getter
+    "#
+    .zsh_exec()
+    .stdout();
+    assert_eq!(out.trim(), r#"MY_GET="hello from zsh""#);
+}
 
 #[test]
 fn set() {
@@ -29,15 +40,4 @@ fn set_rejects_readonly_env() {
         out.contains("after: locked"),
         "expected MY_SET to retain its readonly value, got: {out:?}",
     );
-}
-
-#[test]
-fn get() {
-    let out = r#"
-        MY_GET="hello from zsh"
-        getter
-    "#
-    .zsh_exec()
-    .stdout();
-    assert_eq!(out.trim(), r#"MY_GET="hello from zsh""#);
 }

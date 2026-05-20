@@ -1,6 +1,6 @@
 
 
-use super::common::ZshExec;
+use super::fixtures::ZshExec;
 
 
 
@@ -14,3 +14,7 @@ fn get() {
     .stdout();
     assert_eq!(out.trim(), "MY_INT=42");
 }
+
+#[test]
+#[ignore = "not implemented yet"]
+fn set() {}

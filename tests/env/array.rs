@@ -1,6 +1,6 @@
 
 
-use super::common::ZshExec;
+use super::fixtures::ZshExec;
 
 
 
@@ -14,6 +14,11 @@ fn get() {
     .stdout();
     assert_eq!(out.trim(), r#"MY_ARR=["1", "2", "3"]"#);
 }
+
+
+#[test]
+#[ignore = "not implemented yet"]
+fn set() {}
 
 
 #[test]

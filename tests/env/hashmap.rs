@@ -1,6 +1,6 @@
 
 
-use super::common::ZshExec;
+use super::fixtures::ZshExec;
 
 
 // Surfaces a bug in src/env/implementations.rs: `GetEnv for HashMap<String, String>`
@@ -19,3 +19,7 @@ fn get() {
     .stdout();
     assert_eq!(out.trim(), r#"MY_HASH={"a": "1", "b": "2", "c": "3"}"#);
 }
+
+#[test]
+#[ignore = "not implemented yet"]
+fn set() {}

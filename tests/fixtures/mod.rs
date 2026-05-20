@@ -1,7 +1,7 @@
 use std::env::consts::{DLL_PREFIX, DLL_SUFFIX};
 use std::path::PathBuf;
-use std::process::{Command, Output};
-use std::sync::{LazyLock};
+use std::process::{Command, Output, Stdio};
+use std::sync::LazyLock;
 
 const FIXTURE_LIB_NAME: &str = "test_fixture";
 
@@ -12,7 +12,9 @@ static FIXTURE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut cmd = Command::new(env!("CARGO"));
     cmd.arg("build")
         .arg("--manifest-path")
-        .arg(fixture_root.join("Cargo.toml"));
+        .arg(fixture_root.join("Cargo.toml"))
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
 
     let profile = if cfg!(debug_assertions) {
         "debug"

@@ -1,7 +1,7 @@
-use common::ZshExec;
+use fixtures::ZshExec;
 
-#[path = "../common/mod.rs"]
-pub mod common;
+#[path = "../fixtures/mod.rs"]
+pub mod fixtures;
 
 mod array;
 mod float;

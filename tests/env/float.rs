@@ -1,4 +1,4 @@
-// use super::common::ZshExec;
+// use super::fixtures::ZshExec;
 
 #[test]
 #[ignore = "not implemented yet"]
