@@ -1,3 +1,5 @@
+use std::ffi::CString;
+
 use crate::private::module::name::module_name;
 
 pub(super) fn panic_boundary<F, R>(cb: F) -> Option<R>
@@ -8,13 +10,20 @@ where
     match res {
         Ok(ret) => Some(ret),
         Err(err) => {
-            if let Some(msg) = err.downcast_ref::<&str>() {
-                crate::error!("{:?} Panic: {}", module_name(), msg);
+            let err_message = if let Some(msg) = err.downcast_ref::<&str>() {
+                format!("Panic: {}", msg)
             } else if let Some(msg) = err.downcast_ref::<String>() {
-                crate::error!("{:?} Panic: {}", module_name(), msg);
+                format!("Panic: {}", msg)
             } else {
-                crate::error!("{:?} Panic: No additional information", module_name());
-            }
+                format!("Panic: No additional information")
+            };
+
+            let err_cstr = CString::new(err_message).unwrap_or_else(|_| {
+                CString::new("A panic occurred, but the panic message contained a null byte and could not be displayed.").unwrap()
+            });
+
+            unsafe { zsh::zerrnam(module_name().as_ptr() as _, err_cstr.as_ptr()) };
+
             None
         }
     }
