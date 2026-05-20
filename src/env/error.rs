@@ -2,8 +2,6 @@
 
 /// The error type for operations interacting with environment variables.
 /// Possibly returned from [`env::get()`] and [`env::set()`].
-///
-/// [`env::var()`]: var
 #[derive(Debug, PartialEq, Eq, Clone)]
 /// TODO: maybe use thiserror?
 pub enum ParamError {

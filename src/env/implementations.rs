@@ -70,7 +70,6 @@ impl GetEnv for HashMap<String, String> {
         Ok(map)
     }
 }
-// impl FromParam for ParamValue   { /* paramtab → dispatch by PM_TYPE → recurse */ }
 
 impl SetEnv for &str {
     fn set_env(self, mut name: Vec<u8>) -> Result<(), ParamError> {
@@ -87,8 +86,28 @@ impl SetEnv for &str {
     }
 }
 
-// impl IntoParam for String       { /* same; takes self to enable steal if cheap */ }
-// impl IntoParam for i64          { /* setiparam */ }
-// impl IntoParam for f64          { /* setnparam with MN_FLOAT */ }
-// impl<S: AsRef<str>> IntoParam for &[S] { /* allocate metafied char**, setaparam */ }
-// impl IntoParam for ParamValue   { /* dispatch */ }
+impl SetEnv for String {
+    /* same; takes self to enable steal if cheap */
+    fn set_env(self, _name: Vec<u8>) -> Result<(), ParamError> {
+        todo!()
+    }
+}
+impl SetEnv for i64 {
+    /* setiparam */
+    fn set_env(self, _name: Vec<u8>) -> Result<(), ParamError> {
+        todo!()
+    }
+}
+impl SetEnv for f64 {
+    /* setnparam with MN_FLOAT */
+    fn set_env(self, _name: Vec<u8>) -> Result<(), ParamError> {
+        todo!()
+    }
+}
+
+impl<S: AsRef<str>> SetEnv for &[S] {
+    /* allocate metafied char**, setaparam */
+    fn set_env(self, _name: Vec<u8>) -> Result<(), ParamError> {
+        todo!()
+    }
+}
