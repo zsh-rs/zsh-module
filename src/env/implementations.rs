@@ -49,7 +49,7 @@ impl GetEnv for Vec<String> {
         lookup_value(&name, zsh::PM_ARRAY)?;
 
         unsafe { zsh::getaparam(name.as_ptr() as _) }
-            .ptr_iter()
+            .iter()
             .map(|s| unsafe { CStr::from_ptr(s) }.to_owned().unmetafy())
             .collect()
     }
@@ -60,7 +60,7 @@ impl GetEnv for HashMap<String, String> {
         lookup_value(&name, zsh::PM_HASHED)?;
 
         let map = unsafe { zsh::gethparam(name.as_ptr() as _) }
-            .ptr_iter()
+            .iter()
             .map(|s| unsafe { CStr::from_ptr(s) }.to_owned().unmetafy())
             .collect::<Result<Vec<String>, ParamError>>()?
             .chunks_exact(2)
