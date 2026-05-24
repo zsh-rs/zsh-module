@@ -44,6 +44,42 @@ fn printarr_cmd(_: &mut Fixture, _: &CStr, args: &[&CStr], _: &flags::Flags) -> 
     Ok(())
 }
 
+#[builtin("isetter")]
+fn isetter_cmd(_: &mut Fixture, _: &CStr, args: &[&CStr], _: &flags::Flags) -> Result<()> {
+    let value: i64 = args[0].to_string_lossy().parse().unwrap();
+    match env::set("MY_INT", value) {
+        Ok(()) => println!("isetter: ok"),
+        Err(e) => println!("isetter: error: {:?}", e),
+    }
+    Ok(())
+}
+
+#[builtin("asetter")]
+fn asetter_cmd(_: &mut Fixture, _: &CStr, args: &[&CStr], _: &flags::Flags) -> Result<()> {
+    let arr: Vec<&str> = args.iter().map(|s| s.to_str().unwrap()).collect();
+    match env::set("MY_ARR", arr.as_slice()) {
+        Ok(()) => println!("asetter: ok"),
+        Err(e) => println!("asetter: error: {:?}", e),
+    }
+    Ok(())
+}
+
+#[builtin("hsetter")]
+fn hsetter_cmd(_: &mut Fixture, _: &CStr, args: &[&CStr], _: &flags::Flags) -> Result<()> {
+    let mut map = HashMap::new();
+    for chunk in args.chunks(2) {
+        map.insert(
+            chunk[0].to_string_lossy().to_string(),
+            chunk[1].to_string_lossy().to_string(),
+        );
+    }
+    match env::set("MY_HASH", map) {
+        Ok(()) => println!("hsetter: ok"),
+        Err(e) => println!("hsetter: error: {:?}", e),
+    }
+    Ok(())
+}
+
 #[builtin("hgetter")]
 fn hgetter_cmd(_: &mut Fixture, _: &CStr, args: &[&CStr], _: &flags::Flags) -> Result<()> {
     args.iter()

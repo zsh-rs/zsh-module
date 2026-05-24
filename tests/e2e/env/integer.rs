@@ -16,5 +16,12 @@ fn get() {
 }
 
 #[test]
-#[ignore = "not implemented yet"]
-fn set() {}
+fn set() {
+    let out = r#"
+        isetter 42
+        igetter
+    "#
+    .zsh_exec()
+    .stdout();
+    assert_eq!(out.trim(), "isetter: ok\nMY_INT=42");
+}

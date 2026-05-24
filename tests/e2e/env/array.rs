@@ -17,8 +17,16 @@ fn get() {
 
 
 #[test]
-#[ignore = "not implemented yet"]
-fn set() {}
+fn set() {
+    let out = r#"
+        asetter alpha beta "gamma delta"
+        printarr MY_ARR
+    "#
+    .zsh_exec()
+    .stdout();
+    assert_eq!(out.trim(), r#"asetter: ok
+MY_ARR=["alpha", "beta", "gamma delta"]"#);
+}
 
 
 #[test]
