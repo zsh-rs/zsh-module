@@ -55,6 +55,15 @@ static FIXTURE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
             .expect("failed to symlink fixture cdylib to .so for zmodload");
     }
 
+    // On macOS, zsh may also look for `.bundle` extension.
+    #[cfg(target_os = "macos")]
+    {
+        let bundle_path = out_dir.join(format!("lib{FIXTURE_LIB_NAME}.bundle"));
+        let _ = std::fs::remove_file(&bundle_path);
+        std::os::unix::fs::symlink(&cargo_output, &bundle_path)
+            .expect("failed to symlink fixture cdylib to .bundle for zmodload");
+    }
+
     out_dir
 });
 
