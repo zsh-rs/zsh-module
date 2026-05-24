@@ -1,5 +1,6 @@
+use std::alloc::{alloc, Layout};
 use std::collections::HashMap;
-use std::ffi::{CStr, CString};
+use std::ffi::{c_char, CStr, CString};
 
 use crate::types::ptr_iter::PointerIter;
 
@@ -59,15 +60,17 @@ impl GetEnv for HashMap<String, String> {
     fn get_env(name: Vec<u8>) -> Result<Self, ParamError> {
         lookup_value(&name, zsh::PM_HASHED)?;
 
-        let map = unsafe { zsh::gethparam(name.as_ptr() as _) }
+        let keys = unsafe { zsh::gethkparam(name.as_ptr() as _) }
             .iter()
-            .map(|s| unsafe { CStr::from_ptr(s) }.to_owned().unmetafy())
-            .collect::<Result<Vec<String>, ParamError>>()?
-            .chunks_exact(2)
-            .map(|pair| (pair[0].clone(), pair[1].clone()))
-            .collect();
+            .map(|s| unsafe { CStr::from_ptr(s) }.to_owned().unmetafy());
 
-        Ok(map)
+        let values = unsafe { zsh::gethparam(name.as_ptr() as _) }
+            .iter()
+            .map(|s| unsafe { CStr::from_ptr(s) }.to_owned().unmetafy());
+
+        std::iter::zip(keys, values)
+            .map(|(k, v)| Ok((k?, v?)))
+            .collect::<Result<HashMap<String, String>, ParamError>>()
     }
 }
 
@@ -93,9 +96,10 @@ impl SetEnv for String {
     }
 }
 impl SetEnv for i64 {
-    /* setiparam */
-    fn set_env(self, _name: Vec<u8>) -> Result<(), ParamError> {
-        todo!()
+    fn set_env(self, mut name: Vec<u8>) -> Result<(), ParamError> {
+        unsafe { zsh::setiparam(name.as_mut_ptr() as _, self as zsh::zlong).as_ref() }
+            .ok_or(ParamError::Rejected)?;
+        Ok(())
     }
 }
 impl SetEnv for f64 {
@@ -106,8 +110,66 @@ impl SetEnv for f64 {
 }
 
 impl<S: AsRef<str>> SetEnv for &[S] {
-    /* allocate metafied char**, setaparam */
-    fn set_env(self, _name: Vec<u8>) -> Result<(), ParamError> {
-        todo!()
+    fn set_env(self, mut name: Vec<u8>) -> Result<(), ParamError> {
+        let count = self.len();
+        let size = (count + 1) * std::mem::size_of::<*mut c_char>();
+        let arr = unsafe {
+            alloc(Layout::from_size_align(size, std::mem::align_of::<*mut c_char>()).unwrap())
+                as *mut *mut c_char
+        };
+        if arr.is_null() {
+            return Err(ParamError::Rejected);
+        }
+
+        for (i, s) in self.iter().enumerate() {
+            let cstr = CString::new(s.as_ref()).map_err(|_| ParamError::InvalidValue)?;
+            unsafe {
+                arr.add(i).write(zsh::ztrdup_metafy(cstr.as_ptr()));
+            }
+        }
+
+        unsafe { arr.add(count).write(std::ptr::null_mut()) };
+
+        unsafe { zsh::setaparam(name.as_mut_ptr() as _, arr).as_ref() }
+            .ok_or(ParamError::Rejected)?;
+
+        Ok(())
+    }
+}
+
+impl<S: AsRef<str>> SetEnv for Vec<S> {
+    fn set_env(self, name: Vec<u8>) -> Result<(), ParamError> {
+        self.as_slice().set_env(name)
+    }
+}
+
+impl SetEnv for HashMap<String, String> {
+    fn set_env(self, mut name: Vec<u8>) -> Result<(), ParamError> {
+        let count = self.len();
+        let size = (count * 2 + 1) * std::mem::size_of::<*mut c_char>();
+        let arr = unsafe {
+            alloc(Layout::from_size_align(size, std::mem::align_of::<*mut c_char>()).unwrap())
+                as *mut *mut c_char
+        };
+        if arr.is_null() {
+            return Err(ParamError::Rejected);
+        }
+
+        for (i, (k, v)) in self.into_iter().enumerate() {
+            let key = CString::new(k).map_err(|_| ParamError::InvalidValue)?;
+            let val = CString::new(v).map_err(|_| ParamError::InvalidValue)?;
+
+            unsafe {
+                arr.add(i * 2).write(zsh::ztrdup_metafy(key.as_ptr()));
+                arr.add(i * 2 + 1).write(zsh::ztrdup_metafy(val.as_ptr()));
+            }
+        }
+
+        unsafe { arr.add(count * 2).write(std::ptr::null_mut()) };
+
+        unsafe { zsh::sethparam(name.as_mut_ptr() as _, arr).as_ref() }
+            .ok_or(ParamError::Rejected)?;
+
+        Ok(())
     }
 }
